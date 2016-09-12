@@ -16,38 +16,25 @@
 
 static WAVE_REC_DEF WaveRecorder;
 
-unsigned int ErrorsCounter = 0;
-unsigned int NumberOfSaves = 0;
-unsigned int total = 0;
+unsigned int PacketsNotSaved = 0;
+unsigned int PacketsSaved = 0;
+unsigned int Packets = 0;
 
 void Adc0_3_ISR(void)
 {
 	static unsigned int transfers = 0;
-	static unsigned int _1HzCounter = 0;
+	static unsigned int Counter1Hz = 0;
 	unsigned long AdcSample;
 	// Clear the timer interrupt
 	ADCIntClear(ADC0_BASE,3);
+
 	ADCSequenceDataGet(ADC0_BASE, 3, &AdcSample );
-
 	WaveRecorder.buff.toSave[transfers] = (unsigned int)AdcSample;
-	transfers++;
-	_1HzCounter++;
-	if( _1HzCounter == SAMPLE_RATE )
-	{
-		_1HzCounter = 0;
-		if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_2) )
-		{
-			GPIOPinWrite(GPIO_PORTF_BASE, RED_LED| BLUE_LED|GREEN_LED, 0);
-		}
-		else
-		{
-			GPIOPinWrite(GPIO_PORTF_BASE, RED_LED| BLUE_LED|GREEN_LED, BLUE_LED);
-		}
-	}
 
+	transfers++;
 	if( (transfers)%WAVE_BUFFER_SIZE == 0 )
 	{
-		total++;
+		Packets++;
 		if( WaveRecorder.flgs.Active )
 		{
 			WaveRecorder.buff.toSave = WaveRecorder.buff._1;
@@ -62,6 +49,20 @@ void Adc0_3_ISR(void)
 		WaveRecorder.flgs.Active ^= 1;
 		WaveRecorder.flgs.IsReadyToSave = 1;
 		transfers = 0;
+	}
+
+	Counter1Hz++;
+	if( Counter1Hz == SAMPLE_RATE )
+	{
+		Counter1Hz = 0;
+		if(GPIOPinRead(GPIO_PORTF_BASE, GPIO_PIN_2) )
+		{
+			GPIOPinWrite(GPIO_PORTF_BASE, RED_LED| BLUE_LED|GREEN_LED, 0);
+		}
+		else
+		{
+			GPIOPinWrite(GPIO_PORTF_BASE, RED_LED| BLUE_LED|GREEN_LED, BLUE_LED);
+		}
 	}
 }
 
@@ -79,12 +80,12 @@ void StartRecord()
 	WaveRecorder.States = ADD_SAMPLES;
 	TimerEnable(TIMER1_BASE,TIMER_A);
 	UARTprintf("Adding samples...\n");
-	total = 0;
+	Packets = 0;
 }
 
 void EndRecord()
 {
-	UARTprintf("Total:%d\n",total);
+	UARTprintf("Total:%d\n",Packets);
 	WaveRecorder.flgs.EndRecord = 0;
 	WaveRecorder.States = END_WAVE;
 	TimerDisable(TIMER1_BASE,TIMER_A);
@@ -110,17 +111,15 @@ int main(void)
 				CreateWave(&WaveRecorder.Wave,SAMPLE_RATE,1,16);
 				StartRecord();
 			case ADD_SAMPLES:
-				NumberOfSaves++;
-				if( AddSample(WaveRecorder.Wave,WaveRecorder.buff.toSave,WaveRecorder.buff.size, WAVE_BUFFER_SIZE) )
-				{
-					ErrorsCounter++;
+				if( AddSample(WaveRecorder.Wave,WaveRecorder.buff.toSave,WaveRecorder.buff.size, WAVE_BUFFER_SIZE) ){
+					PacketsNotSaved++;
 				}
 
 				if( WaveRecorder.flgs.EndRecord )
 				{
-					UARTprintf("Total: %d Number of Saves: %d - Number of Errors: %d\n", total, NumberOfSaves, ErrorsCounter);
-					ErrorsCounter = 0;
-					NumberOfSaves = 0;
+					UARTprintf("Packets Created:%d Packets Saved: %d. Packets Not Saved: %d - %d\n", Packets, PacketsSaved, PacketsNotSaved);
+					PacketsNotSaved = 0;
+					PacketsSaved = 0;
 					EndRecord();
 				}
 				break;

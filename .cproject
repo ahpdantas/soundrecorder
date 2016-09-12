@@ -118,6 +118,7 @@
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_15.12.compilerID.GCC.1599324810" name="Enable support for GCC extensions (DEPRECATED) (--gcc)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_15.12.compilerID.GCC" value="true" valueType="boolean"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_15.12.compilerID.DEFINE.1006891195" name="Pre-define NAME (--define, -D)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_15.12.compilerID.DEFINE" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="&quot;ccs&quot;"/>
+									<listOptionValue builtIn="false" value="RELEASE"/>
 									<listOptionValue builtIn="false" value="PART_LM4F120H5QR"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_15.12.compilerID.DIAG_WARNING.1212106153" name="Treat diagnostic &lt;id&gt; as warning (--diag_warning, -pdsw)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_15.12.compilerID.DIAG_WARNING" valueType="stringList">

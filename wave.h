@@ -10,7 +10,7 @@
 
 typedef struct WAVE_DEF* WAVE;
 
-void CreateWave(WAVE* Wave,unsigned short sampleRate, unsigned short numChannels, unsigned short bitsPerSample);
+int CreateWave(WAVE* Wave,unsigned short sampleRate, unsigned short numChannels, unsigned short bitsPerSample);
 int AddSample(WAVE Wave, unsigned short *samples, unsigned int samplesBuffersize, unsigned int numberOfSamples );
 void EndWave(WAVE Wave);
 

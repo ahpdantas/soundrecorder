@@ -112,7 +112,7 @@ void CreateNewWavename(char* fileDst, unsigned int size, UINT *Id )
 	GetWaveNameById(fileDst,size,*Id);
 }
 
-void CreateWave( WAVE* Wave, unsigned short sampleRate, unsigned short numChannels, unsigned short bitsPerSample){
+int CreateWave( WAVE* Wave, unsigned short sampleRate, unsigned short numChannels, unsigned short bitsPerSample){
     static unsigned int Id = 0;
 	FRESULT result;
 
@@ -122,17 +122,13 @@ void CreateWave( WAVE* Wave, unsigned short sampleRate, unsigned short numChanne
     result = f_open( &InternalWave.File, InternalWave.name, FA_WRITE | FA_CREATE_ALWAYS );
  	if( result == FR_OK )
 	{
-//		result = f_write(&InternalWave.File, &(InternalWave.header), sizeof(WAVE_HEADER_DEF),&bw);
-//		if( result == FR_OK )
-//		{
-			UARTprintf("%s oppened with success.\n", InternalWave.name);
-			*Wave = &InternalWave;
-//		}
-//		else
-//		{
-//			*Wave = NULL;
-//		}
+ 		*Wave = &InternalWave;
+ 		return 0;
 	}
+ 	else
+ 	{
+ 		return -1;
+ 	}
 }
 
 int AddSample( WAVE Wave, unsigned short *samples, unsigned int samplesBuffersize, unsigned int numberOfSamples ){
